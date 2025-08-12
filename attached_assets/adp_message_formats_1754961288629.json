@@ -1,0 +1,189 @@
+{
+  "adp_version": "1.0",
+  "protocol_name": "Alignment Delegation Protocol (ADP)",
+  
+  "1_mc_to_nm_request": {
+    "message_type": "delegation_request",
+    "adp_header": {
+      "protocol_version": "1.0",
+      "message_id": "uuid-generated-id",
+      "timestamp": "2025-08-11T14:30:00Z",
+      "session_id": "optional-session-identifier",
+      "source": {
+        "type": "master_controller",
+        "id": "mc-instance-id",
+        "organization": "org-identifier"
+      },
+      "destination": {
+        "type": "narrow_model",
+        "domain": "medical|legal|technical|financial|etc",
+        "preferred_nm_id": "optional-specific-nm-id"
+      },
+      "routing": {
+        "priority": "normal|high|urgent",
+        "max_hops": 3,
+        "timeout_seconds": 30
+      }
+    },
+    "authentication": {
+      "oauth2_token": "bearer-token-for-nm-access",
+      "user_context": "hashed-user-identifier",
+      "permissions": ["read", "analyze", "respond"]
+    },
+    "payload": {
+      "original_query": "user's original question/request",
+      "domain_classification": {
+        "primary_domain": "identified-domain",
+        "confidence_score": 0.85,
+        "keywords": ["key", "terms", "identified"]
+      },
+      "context": {
+        "conversation_history": "relevant-prior-context",
+        "user_preferences": "any-relevant-settings",
+        "safety_flags": ["pii_detected", "sensitive_topic"]
+      },
+      "delegation_intent": {
+        "task_type": "analysis|generation|verification|recommendation",
+        "expected_response_format": "text|structured|citations",
+        "alignment_requirements": ["accuracy", "safety", "bias_awareness"]
+      }
+    }
+  },
+
+  "2_nm_to_mc_response": {
+    "message_type": "delegation_response", 
+    "adp_header": {
+      "protocol_version": "1.0",
+      "message_id": "uuid-generated-id",
+      "response_to": "original-request-message-id",
+      "timestamp": "2025-08-11T14:30:05Z",
+      "source": {
+        "type": "narrow_model",
+        "id": "responding-nm-id",
+        "domain": "medical",
+        "model_info": {
+          "name": "medical-specialist-v2.1",
+          "specialization": "cardiology",
+          "last_updated": "2025-07-15"
+        }
+      },
+      "destination": {
+        "type": "master_controller", 
+        "id": "original-mc-id"
+      }
+    },
+    "payload": {
+      "response_content": "the actual response to the user query",
+      "confidence_metrics": {
+        "overall_confidence": 0.92,
+        "domain_match": 0.95,
+        "factual_confidence": 0.88
+      },
+      "citations": [
+        {
+          "source": "reference-identifier",
+          "relevance": 0.9,
+          "last_verified": "2025-08-01"
+        }
+      ],
+      "alignment_assessment": {
+        "safety_check": "passed|flagged|unknown",
+        "bias_evaluation": "low|moderate|high",
+        "hallucination_risk": "low|moderate|high",
+        "harm_potential": "none|minimal|moderate|high"
+      },
+      "metadata": {
+        "processing_time_ms": 1250,
+        "tokens_used": 850,
+        "fallback_used": false,
+        "human_review_recommended": false
+      }
+    }
+  },
+
+  "3_logging_format_to_ca": {
+    "message_type": "ca_log_entry",
+    "adp_header": {
+      "protocol_version": "1.0", 
+      "message_id": "uuid-generated-id",
+      "timestamp": "2025-08-11T14:30:05Z",
+      "source": {
+        "type": "master_controller|narrow_model",
+        "id": "logging-entity-id"
+      },
+      "destination": {
+        "type": "coordination_agent",
+        "organization": "responsible-govs-org"
+      }
+    },
+    "log_payload": {
+      "event_type": "delegation|response|flag|error",
+      "session_tracking": {
+        "original_request_id": "initial-message-id",
+        "full_conversation_hash": "privacy-preserving-hash"
+      },
+      "participants": {
+        "mc_id": "master-controller-id",
+        "nm_id": "narrow-model-id", 
+        "user_hash": "anonymized-user-identifier"
+      },
+      "alignment_data": {
+        "flags_raised": ["hallucination_detected", "bias_warning"],
+        "confidence_scores": {"accuracy": 0.85, "safety": 0.95},
+        "human_review_triggered": true,
+        "remediation_needed": false
+      },
+      "performance_metrics": {
+        "total_latency_ms": 2100,
+        "routing_accuracy": 0.92,
+        "user_satisfaction": "pending"
+      },
+      "privacy_compliance": {
+        "data_retention_days": 90,
+        "anonymization_level": "full",
+        "jurisdiction": "EU|US|GDPR"
+      }
+    }
+  },
+
+  "4_error_misalignment_flag": {
+    "message_type": "alignment_flag",
+    "adp_header": {
+      "protocol_version": "1.0",
+      "message_id": "uuid-generated-id", 
+      "timestamp": "2025-08-11T14:30:03Z",
+      "priority": "urgent",
+      "source": {
+        "type": "master_controller|narrow_model|coordination_agent",
+        "id": "flagging-entity-id"
+      },
+      "destinations": [
+        {"type": "coordination_agent", "id": "ca-id"},
+        {"type": "master_controller", "id": "mc-id"},
+        {"type": "govs", "organization": "oversight-org"}
+      ]
+    },
+    "flag_payload": {
+      "alert_type": "misalignment|hallucination|bias|safety|error",
+      "severity": "low|moderate|high|critical",
+      "related_message_id": "triggering-message-id",
+      "detection_method": "pattern_match|confidence_threshold|human_report",
+      "flag_details": {
+        "description": "human-readable explanation of the issue",
+        "evidence": "specific content or behavior that triggered flag",
+        "affected_domains": ["medical", "safety"],
+        "user_impact": "potential consequences for user"
+      },
+      "recommended_actions": {
+        "immediate": ["halt_response", "warn_user", "escalate"],
+        "investigation": "further analysis needed",
+        "remediation": "suggested fixes or interventions"
+      },
+      "context": {
+        "conversation_context": "relevant background",
+        "user_vulnerability": "elderly|minor|medical_condition|none",
+        "harm_assessment": "likelihood and severity of potential harm"
+      }
+    }
+  }
+}
