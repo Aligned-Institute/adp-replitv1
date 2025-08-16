@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-ADP (Alignment Delegation Protocol) Demo Script
+ADP (Alignment Delegation Protocol) Demo Script with Wake-up Endpoint
 Complete demonstration of ADP routing, messaging, and delegation
-
-This script creates a realistic demo environment that can be run
-on any system with Python 3.7+ for live demonstrations.
+Now includes server-side wake-up handling for Replit deployment
 """
 
 import json
@@ -20,6 +18,7 @@ import asyncio
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import urllib.parse
 import sys
+import os
 
 # Import our routing logic
 from adp_routing_logic import ADPRouter, NarrowModel, Domain, RoutingRequest, NMStatus
@@ -36,13 +35,13 @@ class ADPMessage:
     message_type: str
     adp_header: Dict
     payload: Dict
-    
+
     def to_json(self) -> str:
         return json.dumps(asdict(self), indent=2, default=str)
 
 class MockNarrowModel:
     """Mock implementation of a Narrow Model for demo purposes"""
-    
+
     def __init__(self, nm_config: NarrowModel):
         self.config = nm_config
         self.specializations = {
@@ -53,27 +52,27 @@ class MockNarrowModel:
             "tech-security-01": "cybersecurity and network protection",
             "financial-risk-01": "financial risk assessment and compliance"
         }
-    
+
     async def process_request(self, request_message: ADPMessage) -> ADPMessage:
         """Simulate processing a delegation request"""
-        
+
         # Simulate processing time based on NM performance
         processing_time = self.config.response_time_avg / 1000.0
         await asyncio.sleep(processing_time)
-        
+
         # Extract query from request
         original_query = request_message.payload.get("original_query", "")
-        
+
         # Generate response based on specialization
         specialization = self.specializations.get(self.config.id, "general analysis")
-        
+
         # Simulate different response qualities based on NM accuracy
         confidence = self.config.accuracy_score + random.uniform(-0.1, 0.05)
         confidence = max(0.1, min(1.0, confidence))
-        
+
         # Create mock response content
         response_content = f"""Based on my specialization in {specialization}, I can provide the following analysis:
-        
+
 Query: {original_query}
 
 Analysis: This query falls within my domain expertise. {self._generate_domain_specific_response(original_query)}
@@ -81,10 +80,10 @@ Analysis: This query falls within my domain expertise. {self._generate_domain_sp
 Confidence: {confidence:.2f}
 Recommendations: {self._generate_recommendations()}
 """
-        
+
         # Check for potential alignment issues
         alignment_flags = self._check_alignment(original_query, response_content)
-        
+
         # Create response message
         response = ADPMessage(
             message_type=ADPMessageType.DELEGATION_RESPONSE.value,
@@ -130,9 +129,9 @@ Recommendations: {self._generate_recommendations()}
                 }
             }
         )
-        
+
         return response
-    
+
     def _generate_domain_specific_response(self, query: str) -> str:
         """Generate domain-specific response content"""
         domain_responses = {
@@ -142,11 +141,11 @@ Recommendations: {self._generate_recommendations()}
             "financial": "Financial risk assessment indicates moderate exposure levels. Consider diversification strategies and regulatory compliance."
         }
         return domain_responses.get(self.config.domain.value, "Standard analysis protocols applied.")
-    
+
     def _generate_recommendations(self) -> str:
         """Generate appropriate recommendations"""
         return f"Based on {self.config.domain.value} best practices, recommend following established protocols and seeking additional expert consultation as needed."
-    
+
     def _generate_citations(self) -> List[Dict]:
         """Generate mock citations"""
         return [
@@ -161,7 +160,7 @@ Recommendations: {self._generate_recommendations()}
                 "last_verified": "2025-07-15"
             }
         ]
-    
+
     def _check_alignment(self, query: str, response: str) -> Dict:
         """Simulate alignment checking"""
         flags = {
@@ -171,34 +170,35 @@ Recommendations: {self._generate_recommendations()}
             "harm": "none",
             "review_needed": False
         }
-        
+
         # Simulate some alignment concerns for demo
         if "dangerous" in query.lower() or "harm" in query.lower():
             flags["safety"] = "flagged"
             flags["harm"] = "moderate"
             flags["review_needed"] = True
-        
+
         if random.random() < 0.1:  # 10% chance of bias flag for demo
             flags["bias"] = "moderate"
-            
+
         if self.config.accuracy_score < 0.8:
             flags["hallucination"] = "moderate"
-            
+
         return flags
 
 class ADPMasterController:
     """Master Controller implementation for ADP"""
-    
+
     def __init__(self, mc_id: str):
         self.mc_id = mc_id
         self.router = ADPRouter()
         self.mock_nms: Dict[str, MockNarrowModel] = {}
         self.ca_logs: List[ADPMessage] = []
+        self.is_initialized = False
         self.setup_demo_environment()
-    
+
     def setup_demo_environment(self):
         """Set up demo NMs and register them"""
-        
+
         demo_nms = [
             NarrowModel("med-cardio-01", Domain.MEDICAL, "http://localhost:8001", 
                        ["cardiology", "diagnostics"], 0.9, response_time_avg=800.0, accuracy_score=0.95),
@@ -213,18 +213,19 @@ class ADPMasterController:
             NarrowModel("financial-risk-01", Domain.FINANCIAL, "http://localhost:8006", 
                        ["risk_assessment", "compliance"], 0.8, response_time_avg=1000.0, accuracy_score=0.90)
         ]
-        
+
         for nm_config in demo_nms:
             self.router.register_nm(nm_config)
             self.mock_nms[nm_config.id] = MockNarrowModel(nm_config)
-            
+
+        self.is_initialized = True
         print(f"✅ Registered {len(demo_nms)} Narrow Models in ADP routing pool")
-    
+
     async def process_user_query(self, query: str, domain: str = "medical", priority: str = "normal") -> Dict:
         """Process a user query through ADP delegation"""
-        
+
         print(f"\n🎯 Processing query: '{query}' [Domain: {domain}, Priority: {priority}]")
-        
+
         # Create delegation request
         domain_enum = Domain(domain.lower())
         routing_request = RoutingRequest(
@@ -233,41 +234,41 @@ class ADPMasterController:
             priority=priority,
             require_validation=True
         )
-        
+
         # Route the request
         routing_result = self.router.route_request(routing_request)
-        
+
         if not routing_result["primary"]:
             return {
                 "error": "No available NMs for domain",
                 "details": routing_result
             }
-        
+
         print(f"📋 Routing result: {routing_result['routing_method']} -> Primary: {routing_result['primary']}")
         if routing_result["validation"]:
             print(f"📋 Validation NMs: {routing_result['validation']}")
-        
+
         # Create ADP request message
         request_message = self._create_delegation_request(query, routing_request, routing_result)
-        
+
         # Process with primary NM
         primary_response = await self.mock_nms[routing_result["primary"]].process_request(request_message)
-        
+
         # Process with validation NMs if any
         validation_responses = []
         for val_nm_id in routing_result["validation"]:
             if val_nm_id in self.mock_nms:
                 val_response = await self.mock_nms[val_nm_id].process_request(request_message)
                 validation_responses.append(val_response)
-        
+
         # Log to CA
         await self._log_to_ca(request_message, primary_response, validation_responses)
-        
+
         # Clean up routing (mark requests complete)
         self.router.complete_request(routing_result["primary"])
         for val_nm_id in routing_result["validation"]:
             self.router.complete_request(val_nm_id)
-        
+
         # Return complete result
         return {
             "routing": routing_result,
@@ -276,10 +277,10 @@ class ADPMasterController:
             "validation_responses": [json.loads(vr.to_json()) for vr in validation_responses],
             "summary": self._create_summary(primary_response, validation_responses)
         }
-    
+
     def _create_delegation_request(self, query: str, routing_request: RoutingRequest, routing_result: Dict) -> ADPMessage:
         """Create ADP delegation request message"""
-        
+
         return ADPMessage(
             message_type=ADPMessageType.DELEGATION_REQUEST.value,
             adp_header={
@@ -322,21 +323,21 @@ class ADPMasterController:
                 }
             }
         )
-    
+
     async def _log_to_ca(self, request: ADPMessage, primary_response: ADPMessage, validation_responses: List[ADPMessage]):
         """Log transaction to Coordination Agent"""
-        
+
         # Check for alignment flags
         alignment_flags = []
         review_needed = False
-        
+
         # Check primary response
         if primary_response.payload["alignment_assessment"]["safety_check"] != "passed":
             alignment_flags.append("safety_concern_primary")
         if primary_response.payload["alignment_assessment"]["harm_potential"] != "none":
             alignment_flags.append("harm_potential_detected")
             review_needed = True
-        
+
         # Create CA log entry
         ca_log = ADPMessage(
             message_type=ADPMessageType.CA_LOG_ENTRY.value,
@@ -382,16 +383,16 @@ class ADPMasterController:
                 }
             }
         )
-        
+
         self.ca_logs.append(ca_log)
         print(f"📝 Logged to CA: {len(alignment_flags)} alignment flags, Review needed: {review_needed}")
-    
+
     def _create_summary(self, primary_response: ADPMessage, validation_responses: List[ADPMessage]) -> Dict:
         """Create human-readable summary of the delegation"""
-        
+
         primary_confidence = primary_response.payload["confidence_metrics"]["overall_confidence"]
         primary_nm = primary_response.adp_header["source"]["id"]
-        
+
         summary = {
             "primary_nm": primary_nm,
             "primary_confidence": f"{primary_confidence:.2%}",
@@ -400,17 +401,17 @@ class ADPMasterController:
             "processing_time": f"{primary_response.payload['metadata']['processing_time_ms']}ms",
             "recommendation": "Response approved for user" if primary_confidence > 0.8 else "Consider additional review"
         }
-        
+
         if validation_responses:
             val_confidences = [vr.payload["confidence_metrics"]["overall_confidence"] for vr in validation_responses]
             summary["validation_consensus"] = f"{sum(val_confidences) / len(val_confidences):.2%}"
-        
+
         return summary
-    
+
     def get_system_status(self) -> Dict:
         """Get current ADP system status"""
         stats = self.router.get_routing_stats()
-        
+
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "adp_version": "1.0",
@@ -418,63 +419,168 @@ class ADPMasterController:
             "routing_stats": stats,
             "ca_logs": len(self.ca_logs),
             "total_transactions": sum(stats["domains"][d]["total"] for d in stats["domains"]),
-            "system_health": "🟢 HEALTHY" if stats["overall_health"] > 0.8 else "🟡 DEGRADED" if stats["overall_health"] > 0.5 else "🔴 CRITICAL"
+            "system_health": "🟢 HEALTHY" if stats["overall_health"] > 0.8 else "🟡 DEGRADED" if stats["overall_health"] > 0.5 else "🔴 CRITICAL",
+            "is_initialized": self.is_initialized
         }
 
 class ADPDemoWebServer:
-    """Simple web server for interactive demo"""
-    
+    """Simple web server for interactive demo with wake-up endpoint"""
+
     def __init__(self, mc: ADPMasterController, port: int = 8000):
         self.mc = mc
         self.port = port
-    
+        self.start_time = time.time()
+
     def start_server(self):
         """Start the demo web server"""
-        
+
         class DemoHandler(BaseHTTPRequestHandler):
+            def log_message(self, format, *args):
+                """Override to reduce console spam in production"""
+                # Only log non-routine requests
+                if not any(path in self.path for path in ['/favicon.ico', '/status']):
+                    super().log_message(format, *args)
+
             def do_GET(self):
                 if self.path == '/':
                     self.serve_demo_page()
                 elif self.path == '/status':
                     self.serve_status()
+                elif self.path == '/wakeup':
+                    self.serve_wakeup()
+                elif self.path == '/health':
+                    self.serve_health_check()
                 elif self.path.startswith('/query'):
                     self.serve_query()
                 else:
                     self.send_error(404)
-            
+
+            def do_POST(self):
+                # Handle POST requests for wakeup as well
+                if self.path == '/wakeup':
+                    self.serve_wakeup()
+                else:
+                    self.send_error(404)
+
+            def do_OPTIONS(self):
+                # Handle CORS preflight requests
+                self.send_response(200)
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.end_headers()
+
+            def serve_wakeup(self):
+                """Handle wake-up requests from client-side"""
+                print(f"🚀 Wake-up request received at {datetime.now()}")
+
+                # Initialize if not already done
+                if not server.mc.is_initialized:
+                    print("🔧 Re-initializing system...")
+                    server.mc.setup_demo_environment()
+
+                # Warm up the system with a test query
+                try:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+
+                    # Run a quick test query to warm up all components
+                    warmup_result = loop.run_until_complete(
+                        server.mc.process_user_query(
+                            "System warmup test query", 
+                            "medical", 
+                            "normal"
+                        )
+                    )
+                    loop.close()
+
+                    print("✅ System warmed up successfully")
+
+                    response_data = {
+                        "status": "awake",
+                        "message": "ADP Demo system is now fully operational",
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "uptime_seconds": int(time.time() - server.start_time),
+                        "system_health": server.mc.get_system_status()["system_health"],
+                        "warmup_successful": True
+                    }
+
+                except Exception as e:
+                    print(f"⚠️ Warmup failed: {str(e)}")
+                    response_data = {
+                        "status": "awake",
+                        "message": "ADP Demo system is awake but warmup failed",
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "uptime_seconds": int(time.time() - server.start_time),
+                        "warmup_successful": False,
+                        "error": str(e)
+                    }
+
+                # Send response with CORS headers
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Cache-Control', 'no-cache')
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data, indent=2).encode())
+
+            def serve_health_check(self):
+                """Simple health check endpoint"""
+                health_data = {
+                    "status": "healthy",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "uptime_seconds": int(time.time() - server.start_time),
+                    "initialized": server.mc.is_initialized
+                }
+
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(json.dumps(health_data).encode())
+
             def serve_demo_page(self):
                 html = """<!DOCTYPE html>
 <html>
 <head>
     <title>ADP (Alignment Delegation Protocol) Demo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
         .header { background: #2c3e50; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .status-indicator { display: inline-block; padding: 5px 10px; border-radius: 4px; color: white; margin-left: 10px; }
+        .status-online { background: #28a745; }
+        .status-loading { background: #ffc107; color: #212529; }
         .demo-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
         .query-form { background: #ecf0f1; padding: 15px; border-radius: 8px; }
         input[type="text"] { width: 70%; padding: 8px; margin: 5px; }
         select { padding: 8px; margin: 5px; }
         button { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:hover { background: #2980b9; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
         .result { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #28a745; }
         .error { border-left-color: #dc3545; background: #f8d7da; }
         pre { white-space: pre-wrap; font-size: 12px; overflow-x: auto; }
         .status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; }
         .stat-card { background: #e8f4fd; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; }
+        .loading { text-align: center; color: #6c757d; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🤖 ADP (Alignment Delegation Protocol) Live Demo</h1>
-            <p>Demonstrating intelligent AI model delegation with alignment oversight</p>
+            <p>Demonstrating intelligent AI model delegation with alignment oversight 
+               <span id="status-indicator" class="status-indicator status-loading">Checking Status...</span>
+            </p>
         </div>
-        
+
         <div class="demo-section">
             <h3>🎯 Test ADP Delegation</h3>
             <div class="query-form">
-                <form action="/query" method="get">
+                <form action="/query" method="get" id="query-form">
                     <input type="text" name="q" placeholder="Enter your query (e.g., 'What are symptoms of chest pain?')" required>
                     <select name="domain">
                         <option value="medical">Medical</option>
@@ -491,13 +597,13 @@ class ADPDemoWebServer:
                 </form>
             </div>
         </div>
-        
+
         <div class="demo-section">
             <h3>📊 System Status</h3>
             <button onclick="loadStatus()">🔄 Refresh Status</button>
-            <div id="status-display">Click refresh to load system status...</div>
+            <div id="status-display">Loading system status...</div>
         </div>
-        
+
         <div class="demo-section">
             <h3>📋 About ADP Protocol</h3>
             <p><strong>ADP Version 1.0</strong> demonstrates:</p>
@@ -510,8 +616,66 @@ class ADPDemoWebServer:
             </ul>
         </div>
     </div>
-    
+
     <script>
+        let systemReady = false;
+
+        // Check system status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSystemStatus();
+            loadStatus();
+        });
+
+        function checkSystemStatus() {
+            const indicator = document.getElementById('status-indicator');
+            const form = document.getElementById('query-form');
+
+            fetch('/health')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.initialized) {
+                        indicator.textContent = 'System Online';
+                        indicator.className = 'status-indicator status-online';
+                        systemReady = true;
+
+                        // Enable form
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        submitBtn.disabled = false;
+                    } else {
+                        indicator.textContent = 'Initializing...';
+                        indicator.className = 'status-indicator status-loading';
+
+                        // Trigger wake-up
+                        wakeupSystem();
+                    }
+                })
+                .catch(err => {
+                    console.error('Status check failed:', err);
+                    indicator.textContent = 'System Error';
+                    indicator.className = 'status-indicator';
+                    indicator.style.background = '#dc3545';
+                });
+        }
+
+        function wakeupSystem() {
+            console.log('Triggering system wake-up...');
+
+            fetch('/wakeup', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Wake-up response:', data);
+
+                    // Check status again after wake-up
+                    setTimeout(checkSystemStatus, 2000);
+                })
+                .catch(err => {
+                    console.error('Wake-up failed:', err);
+
+                    // Retry after delay
+                    setTimeout(wakeupSystem, 5000);
+                });
+        }
+
         function loadStatus() {
             fetch('/status')
                 .then(response => response.json())
@@ -529,6 +693,14 @@ class ADPDemoWebServer:
                         '<div class="result error">Error loading status: ' + err + '</div>';
                 });
         }
+
+        // Prevent form submission if system not ready
+        document.getElementById('query-form').addEventListener('submit', function(e) {
+            if (!systemReady) {
+                e.preventDefault();
+                alert('System is still initializing. Please wait a moment and try again.');
+            }
+        });
     </script>
 </body>
 </html>"""
@@ -536,7 +708,7 @@ class ADPDemoWebServer:
                 self.send_header('Content-type', 'text/html')
                 self.end_headers()
                 self.wfile.write(html.encode())
-            
+
             def serve_status(self):
                 status = server.mc.get_system_status()
                 self.send_response(200)
@@ -544,31 +716,33 @@ class ADPDemoWebServer:
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
                 self.wfile.write(json.dumps(status, indent=2).encode())
-            
+
             def serve_query(self):
                 parsed_url = urllib.parse.urlparse(self.path)
                 params = urllib.parse.parse_qs(parsed_url.query)
-                
+
                 query = params.get('q', [''])[0]
                 domain = params.get('domain', ['medical'])[0]
                 priority = params.get('priority', ['normal'])[0]
-                
+
                 if not query:
                     self.send_error(400, "Query parameter 'q' required")
                     return
-                
+
                 # Process query asynchronously
                 try:
                     loop = asyncio.new_event_loop()
                     asyncio.set_event_loop(loop)
                     result = loop.run_until_complete(server.mc.process_user_query(query, domain, priority))
                     loop.close()
-                    
+
                     # Return HTML response
                     html = f"""<!DOCTYPE html>
 <html>
 <head>
     <title>ADP Query Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {{ font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }}
         .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }}
@@ -585,7 +759,7 @@ class ADPDemoWebServer:
     <div class="container">
         <h1>🎯 ADP Query Result</h1>
         <a href="/" class="back-btn">← Back to Demo</a>
-        
+
         <div class="result">
             <h3>📋 Query Summary</h3>
             <p><strong>Query:</strong> {query}</p>
@@ -596,46 +770,61 @@ class ADPDemoWebServer:
             <p><strong>Status:</strong> <span class="status {'safe' if 'SAFE' in result['summary']['alignment_status'] else 'flagged'}">{result['summary']['alignment_status']}</span></p>
             <p><strong>Processing Time:</strong> {result['summary']['processing_time']}</p>
         </div>
-        
+
         <div class="result">
             <h3>🤖 Primary Response</h3>
             <pre>{result['primary_response']['payload']['response_content']}</pre>
         </div>
-        
+
         {f'''<div class="result">
             <h3>🔍 Validation Responses ({len(result['validation_responses'])})</h3>
             <p><strong>Consensus:</strong> {result['summary'].get('validation_consensus', 'N/A')}</p>
         </div>''' if result['validation_responses'] else ''}
-        
+
         <div class="summary">
             <h3>🔧 Technical Details</h3>
             <p><strong>Routing Method:</strong> {result['routing']['routing_method']}</p>
-            <pre>{json.dumps(result, indent=2)}</pre>
+            <details>
+                <summary>Full JSON Response</summary>
+                <pre>{json.dumps(result, indent=2)}</pre>
+            </details>
         </div>
     </div>
 </body>
 </html>"""
-                    
+
                     self.send_response(200)
                     self.send_header('Content-type', 'text/html')
                     self.end_headers()
                     self.wfile.write(html.encode())
-                    
+
                 except Exception as e:
                     error_html = f"""<!DOCTYPE html>
-<html><head><title>Error</title></head>
+<html><head><title>Error</title><meta charset="UTF-8"></head>
 <body><h1>Error Processing Query</h1><p>{str(e)}</p><a href="/">← Back</a></body></html>"""
                     self.send_response(500)
                     self.send_header('Content-type', 'text/html')
                     self.end_headers()
                     self.wfile.write(error_html.encode())
-        
+
         server = self
-        httpd = HTTPServer(('localhost', self.port), DemoHandler)
-        print(f"\n🌐 ADP Demo Server starting at http://localhost:{self.port}")
+
+        # Get port from environment variable if available (for Replit deployment)
+        port = int(os.environ.get('PORT', self.port))
+
+        httpd = HTTPServer(('0.0.0.0', port), DemoHandler)
+        print(f"\n🌐 ADP Demo Server starting on port {port}")
+        print(f"🔗 Local URL: http://localhost:{port}")
+
+        # For Replit, also show the public URL format
+        replit_url = os.environ.get('REPL_SLUG')
+        if replit_url:
+            print(f"🌍 Replit URL: https://{replit_url}.{os.environ.get('REPL_OWNER', 'user')}.repl.co")
+
         print("🎯 Open your browser to interact with the demo!")
+        print("🚀 The /wakeup endpoint is ready for external wake-up calls")
         print("⚡ Press Ctrl+C to stop the server\n")
-        
+
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
@@ -646,10 +835,10 @@ async def run_console_demo():
     """Run console-based demo"""
     print("🚀 ADP (Alignment Delegation Protocol) Console Demo")
     print("=" * 60)
-    
+
     # Initialize Master Controller
     mc = ADPMasterController("demo-mc-001")
-    
+
     # Demo queries
     demo_queries = [
         ("What are the symptoms of chest pain?", "medical", "normal"),
@@ -657,26 +846,26 @@ async def run_console_demo():
         ("Analyze network security vulnerabilities", "technical", "urgent"),
         ("Assess financial risk exposure", "financial", "normal")
     ]
-    
+
     # Run demo queries
     for i, (query, domain, priority) in enumerate(demo_queries, 1):
         print(f"\n{'='*60}")
         print(f"DEMO QUERY {i}/4")
         print(f"{'='*60}")
-        
+
         result = await mc.process_user_query(query, domain, priority)
-        
+
         print(f"\n📊 SUMMARY:")
         for key, value in result['summary'].items():
             print(f"   {key}: {value}")
-        
+
         print(f"\n🤖 PRIMARY RESPONSE PREVIEW:")
         preview = result['primary_response']['payload']['response_content'][:200] + "..."
         print(f"   {preview}")
-        
+
         # Brief pause between queries
         await asyncio.sleep(1)
-    
+
     # Show final system status
     print(f"\n{'='*60}")
     print("FINAL SYSTEM STATUS")
@@ -691,30 +880,30 @@ def main():
     print("1. 🌐 Web Server Demo (Interactive browser interface)")
     print("2. 💻 Console Demo (Automated test scenarios)")
     print("3. 📊 Status Only (Show system status and exit)")
-    
+
     try:
         choice = input("\nEnter your choice (1-3): ").strip()
-        
+
         if choice == "1":
             # Web server demo
             mc = ADPMasterController("demo-mc-web-001")
-            demo_server = ADPDemoWebServer(mc, port=8000)
+            demo_server = ADPDemoWebServer(mc)
             demo_server.start_server()
-            
+
         elif choice == "2":
             # Console demo
             asyncio.run(run_console_demo())
-            
+
         elif choice == "3":
             # Status only
             mc = ADPMasterController("demo-mc-status-001")
             status = mc.get_system_status()
             print("\n🎯 ADP System Status:")
             print(json.dumps(status, indent=2))
-            
+
         else:
             print("❌ Invalid choice. Please run again and select 1, 2, or 3.")
-            
+
     except KeyboardInterrupt:
         print("\n\n👋 Demo cancelled by user")
     except Exception as e:
@@ -722,7 +911,15 @@ def main():
         print("\nFor troubleshooting:")
         print("1. Ensure Python 3.7+ is installed")
         print("2. Make sure adp_routing_logic.py is in the same directory")
-        print("3. Check that no other service is using port 8000")
+        print("3. Check that no other service is using the port")
 
+# Auto-start web server if running directly (useful for Replit)
 if __name__ == "__main__":
-    main()
+    # Check if we're in a deployment environment (like Replit)
+    if os.environ.get('REPL_SLUG') or os.environ.get('PORT'):
+        print("🔧 Detected deployment environment - starting web server automatically")
+        mc = ADPMasterController("demo-mc-deploy-001")
+        demo_server = ADPDemoWebServer(mc)
+        demo_server.start_server()
+    else:
+        main()
