@@ -92,55 +92,64 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
   };
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Query Input */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold flex items-center text-white">
-            <Terminal className="mr-2 text-adp-blue" size={20} />
-            Query Interface
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">Domain</Label>
-              <Select value={domain} onValueChange={setDomain}>
-                <SelectTrigger className="w-full bg-gray-700 border-gray-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-700 border-gray-600">
-                  <SelectItem value="medical">Medical</SelectItem>
-                  <SelectItem value="legal">Legal</SelectItem>
-                  <SelectItem value="technical">Technical</SelectItem>
-                  <SelectItem value="financial">Financial</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+    <div className="h-full flex flex-col">
+      <div className="p-6 space-y-6 flex-1">
+        {/* Enhanced Query Input */}
+        <Card className="card-enhanced animate-slide-in-up">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold flex items-center text-white">
+              <div className="w-8 h-8 bg-gradient-adp rounded-lg flex items-center justify-center mr-3 shadow-lg">
+                <Terminal className="text-white" size={18} />
+              </div>
+              <div>
+                <div className="text-white">Query Interface</div>
+                <div className="text-xs text-gray-400 font-normal">Submit queries for ADP routing</div>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-gray-200">Domain</Label>
+                <Select value={domain} onValueChange={setDomain}>
+                  <SelectTrigger className="w-full bg-dark-surface border-dark-border text-white hover:border-adp-blue transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-dark-card border-dark-border">
+                    <SelectItem value="medical" className="hover:bg-dark-card-hover">🏥 Medical</SelectItem>
+                    <SelectItem value="legal" className="hover:bg-dark-card-hover">⚖️ Legal</SelectItem>
+                    <SelectItem value="technical" className="hover:bg-dark-card-hover">💻 Technical</SelectItem>
+                    <SelectItem value="financial" className="hover:bg-dark-card-hover">💰 Financial</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">Priority</Label>
-              <Select value={priority} onValueChange={setPriority}>
-                <SelectTrigger className="w-full bg-gray-700 border-gray-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-700 border-gray-600">
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-gray-200">Priority Level</Label>
+                <Select value={priority} onValueChange={setPriority}>
+                  <SelectTrigger className="w-full bg-dark-surface border-dark-border text-white hover:border-adp-blue transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-dark-card border-dark-border">
+                    <SelectItem value="normal" className="hover:bg-dark-card-hover">🟢 Normal</SelectItem>
+                    <SelectItem value="high" className="hover:bg-dark-card-hover">🟡 High</SelectItem>
+                    <SelectItem value="urgent" className="hover:bg-dark-card-hover">🔴 Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div>
-              <Label className="block text-sm font-medium text-gray-300 mb-2">Query</Label>
-              <Textarea
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="w-full bg-gray-700 border-gray-600 text-white h-24 resize-none"
-                placeholder="Enter your query here..."
-              />
-            </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-gray-200">Query Content</Label>
+                <Textarea
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="w-full bg-dark-surface border-dark-border text-white h-32 resize-none hover:border-adp-blue focus:border-adp-blue transition-colors"
+                  placeholder="Enter your query here for AI model delegation..."
+                />
+                <div className="text-xs text-gray-400">
+                  {query.length}/500 characters
+                </div>
+              </div>
 
             <Button 
               type="submit" 
@@ -207,6 +216,7 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

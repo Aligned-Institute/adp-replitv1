@@ -35,21 +35,26 @@ export function NMHealthMonitor({ narrowModels }: NMHealthMonitorProps) {
   };
 
   return (
-    <Card className="bg-dark-card border-dark-border">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center text-white">
-          <Activity className="mr-2 text-adp-green" size={20} />
-          NM Health Monitor
+    <Card className="card-enhanced animate-slide-in-up" style={{animationDelay: '0.1s'}}>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-bold flex items-center text-white">
+          <div className="w-8 h-8 bg-gradient-success rounded-lg flex items-center justify-center mr-3 shadow-lg">
+            <Activity className="text-white" size={18} />
+          </div>
+          <div>
+            <div className="text-white">NM Health Monitor</div>
+            <div className="text-xs text-gray-400 font-normal">Real-time model status</div>
+          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 space-y-3 max-h-96 overflow-y-auto">
-        {narrowModels.map((nm) => (
-          <div key={nm.id} className="bg-gray-700 rounded-lg p-3">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-white">{nm.id}</span>
-              <div className="flex items-center space-x-1">
-                <div className={`w-2 h-2 rounded-full ${getStatusColor(nm.status)}`} />
-                <span className={`text-xs capitalize ${getStatusTextColor(nm.status)}`}>
+      <CardContent className="p-6 space-y-4 max-h-96 overflow-y-auto">
+        {narrowModels.map((nm, index) => (
+          <div key={nm.id} className="bg-dark-surface rounded-xl p-4 border border-dark-border hover:border-adp-blue transition-all duration-300 animate-slide-in-up" style={{animationDelay: `${index * 0.1}s`}}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-bold text-white">{nm.id}</span>
+              <div className="flex items-center space-x-2">
+                <div className={`status-dot ${getStatusColor(nm.status)} ${nm.status === 'healthy' ? 'status-pulse' : ''}`} />
+                <span className={`text-xs capitalize font-semibold ${getStatusTextColor(nm.status)}`}>
                   {nm.status}
                 </span>
               </div>

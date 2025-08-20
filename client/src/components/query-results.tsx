@@ -33,11 +33,16 @@ export function QueryResults({ responses, routingResult }: QueryResultsProps) {
   };
 
   return (
-    <Card className="bg-dark-card border-dark-border">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center text-white">
-          <MessageSquare className="mr-2 text-adp-blue" size={20} />
-          Query Results
+    <Card className="card-enhanced animate-slide-in-up" style={{animationDelay: '0.2s'}}>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-bold flex items-center text-white">
+          <div className="w-8 h-8 bg-gradient-adp rounded-lg flex items-center justify-center mr-3 shadow-lg">
+            <MessageSquare className="text-white" size={18} />
+          </div>
+          <div>
+            <div className="text-white">Query Results</div>
+            <div className="text-xs text-gray-400 font-normal">AI model responses</div>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4">

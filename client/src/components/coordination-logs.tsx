@@ -33,32 +33,38 @@ export function CoordinationLogs({ logs }: CoordinationLogsProps) {
   };
 
   return (
-    <Card className="bg-dark-card border-dark-border">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center text-white">
-          <ClipboardList className="mr-2 text-adp-blue" size={20} />
-          Coordination Agent Logs
-          <Badge variant="secondary" className="ml-auto bg-gray-600 text-xs">
+    <Card className="card-enhanced animate-slide-in-up" style={{animationDelay: '0.3s'}}>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl font-bold flex items-center text-white">
+          <div className="w-8 h-8 bg-gradient-adp rounded-lg flex items-center justify-center mr-3 shadow-lg">
+            <ClipboardList className="text-white" size={18} />
+          </div>
+          <div className="flex-1">
+            <div className="text-white">Coordination Agent Logs</div>
+            <div className="text-xs text-gray-400 font-normal">Real-time system events</div>
+          </div>
+          <Badge variant="secondary" className="bg-gradient-success text-white px-3 py-1 animate-pulse-glow">
+            <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
             Live
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="space-y-2 max-h-60 overflow-y-auto">
+      <CardContent className="p-6">
+        <div className="space-y-3 max-h-72 overflow-y-auto">
           {logs.length > 0 ? (
-            logs.map((log) => (
-              <div key={log.id} className="flex items-start space-x-3 p-3 bg-gray-700 rounded-lg text-sm">
-                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${getEventColor(log.eventType)}`} />
+            logs.map((log, index) => (
+              <div key={log.id} className="flex items-start space-x-4 p-4 bg-dark-surface rounded-xl border border-dark-border hover:border-adp-blue transition-all duration-300 animate-slide-in-up" style={{animationDelay: `${index * 0.05}s`}}>
+                <div className={`status-dot ${getEventColor(log.eventType)} mt-1 flex-shrink-0`} />
                 <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-white capitalize">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-white capitalize text-sm">
                       {log.eventType.replace('_', ' ')}
                     </span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-gray-400 font-mono">
                       {formatTime(log.timestamp)}
                     </span>
                   </div>
-                  <div className="text-xs text-gray-300">
+                  <div className="text-sm text-gray-300 leading-relaxed">
                     {log.description}
                   </div>
                   {log.metadata && Object.keys(log.metadata).length > 0 && (

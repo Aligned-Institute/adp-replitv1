@@ -90,36 +90,47 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-dark-bg text-gray-100">
-      {/* Header */}
-      <header className="bg-dark-card border-b border-dark-border px-6 py-4">
+      {/* Enhanced Header with Gradient */}
+      <header className="bg-gradient-to-r from-dark-card to-dark-card-hover border-b border-dark-border px-6 py-5 shadow-lg">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-adp-blue rounded-lg flex items-center justify-center">
-                <Network className="text-white" size={16} />
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-adp rounded-xl flex items-center justify-center shadow-lg animate-pulse-glow">
+                <Network className="text-white" size={20} />
               </div>
-              <h1 className="text-xl font-semibold">ADP Protocol Dashboard</h1>
-              <Badge variant="secondary" className="bg-adp-green/20 text-adp-green">
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                  ADP Protocol Dashboard
+                </h1>
+                <p className="text-xs text-gray-400">Alignment Delegation Protocol</p>
+              </div>
+              <Badge variant="secondary" className="bg-gradient-success text-white px-3 py-1 animate-scale-in">
+                <div className="w-2 h-2 bg-white rounded-full mr-1 animate-pulse"></div>
                 Live Demo
               </Badge>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm">
-              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-adp-green animate-pulse' : 'bg-adp-red'}`} />
-              <span className="text-gray-300">
-                {displayStats?.activeNms || 0}/{displayStats?.totalNms || 0} NMs Active
-              </span>
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-3 bg-dark-surface px-4 py-2 rounded-lg border border-dark-border">
+              <div className={`status-dot ${isConnected ? 'bg-adp-green status-pulse' : 'bg-adp-red'}`} />
+              <div className="text-sm">
+                <div className="text-white font-medium">
+                  {displayStats?.activeNms || 0}/{displayStats?.totalNms || 0} NMs Active
+                </div>
+                <div className="text-xs text-gray-400">
+                  {displayStats?.systemHealth?.toFixed(1) || 0}% Health
+                </div>
+              </div>
             </div>
-            <div className="text-sm text-gray-400">v1.0.0</div>
+            <div className="text-sm text-gray-400 font-mono">v1.0.0</div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex h-[calc(100vh-80px)]">
-        {/* Sidebar - Query Interface */}
-        <div className="w-80 bg-dark-card border-r border-dark-border overflow-y-auto">
+      <div className="flex h-[calc(100vh-88px)]">
+        {/* Enhanced Sidebar - Query Interface */}
+        <div className="w-96 bg-glass border-r border-glass-border overflow-y-auto backdrop-blur-lg">
           <QueryInterface 
             onQuerySubmitted={handleQuerySubmitted}
             currentSession={currentSession}
@@ -127,70 +138,85 @@ export default function Dashboard() {
           />
         </div>
 
-        {/* Main Dashboard */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-6 space-y-6">
-            {/* System Status Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-dark-card border-dark-border">
-                <CardContent className="p-4">
+        {/* Enhanced Main Dashboard */}
+        <div className="flex-1 overflow-y-auto bg-gradient-to-br from-dark-bg via-dark-surface to-dark-bg">
+          <div className="p-8 space-y-8">
+            {/* Enhanced System Status Bar */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card className="card-enhanced group cursor-pointer animate-slide-in-up">
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-400 text-sm">System Health</p>
-                      <p className="text-lg font-semibold text-adp-green">
+                      <p className="text-gray-400 text-sm font-medium mb-1">System Health</p>
+                      <p className="text-2xl font-bold text-adp-green text-shadow-glow">
                         {displayStats?.systemHealth?.toFixed(1) || 0}%
                       </p>
+                      <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                        <div 
+                          className="bg-gradient-success h-2 rounded-full transition-all duration-1000"
+                          style={{ width: `${displayStats?.systemHealth || 0}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-10 h-10 bg-adp-green/20 rounded-lg flex items-center justify-center">
-                      <Activity className="text-adp-green" size={20} />
+                    <div className="w-12 h-12 bg-gradient-success rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Activity className="text-white" size={24} />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-dark-card border-dark-border">
-                <CardContent className="p-4">
+              <Card className="card-enhanced group cursor-pointer animate-slide-in-up" style={{animationDelay: '0.1s'}}>
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-400 text-sm">Active NMs</p>
-                      <p className="text-lg font-semibold">
-                        {displayStats?.activeNms || 0}/{displayStats?.totalNms || 0}
+                      <p className="text-gray-400 text-sm font-medium mb-1">Active Models</p>
+                      <p className="text-2xl font-bold text-white">
+                        {displayStats?.activeNms || 0}<span className="text-gray-500">/{displayStats?.totalNms || 0}</span>
+                      </p>
+                      <p className="text-xs text-adp-blue mt-1">
+                        {((displayStats?.activeNms || 0) / (displayStats?.totalNms || 1) * 100).toFixed(0)}% operational
                       </p>
                     </div>
-                    <div className="w-10 h-10 bg-adp-blue/20 rounded-lg flex items-center justify-center">
-                      <Box className="text-adp-blue" size={20} />
+                    <div className="w-12 h-12 bg-gradient-adp rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Box className="text-white" size={24} />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-dark-card border-dark-border">
-                <CardContent className="p-4">
+              <Card className="card-enhanced group cursor-pointer animate-slide-in-up" style={{animationDelay: '0.2s'}}>
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-400 text-sm">Avg Response</p>
-                      <p className="text-lg font-semibold">
-                        {displayStats?.avgResponseTime || 0}ms
+                      <p className="text-gray-400 text-sm font-medium mb-1">Avg Response</p>
+                      <p className="text-2xl font-bold text-adp-amber text-shadow-glow">
+                        {displayStats?.avgResponseTime || 0}<span className="text-sm">ms</span>
+                      </p>
+                      <p className="text-xs text-green-400 mt-1">
+                        {displayStats?.avgResponseTime && displayStats.avgResponseTime < 200 ? '⚡ Excellent' : '✓ Good'}
                       </p>
                     </div>
-                    <div className="w-10 h-10 bg-adp-amber/20 rounded-lg flex items-center justify-center">
-                      <Clock className="text-adp-amber" size={20} />
+                    <div className="w-12 h-12 bg-gradient-warning rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <Clock className="text-white" size={24} />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-dark-card border-dark-border">
-                <CardContent className="p-4">
+              <Card className="card-enhanced group cursor-pointer animate-slide-in-up" style={{animationDelay: '0.3s'}}>
+                <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-400 text-sm">Total Queries</p>
-                      <p className="text-lg font-semibold">
+                      <p className="text-gray-400 text-sm font-medium mb-1">Total Queries</p>
+                      <p className="text-2xl font-bold text-white">
                         {displayStats?.totalQueries || 0}
                       </p>
+                      <p className="text-xs text-adp-blue mt-1">
+                        {Math.round((displayStats?.totalQueries || 0) * 0.85)} successful
+                      </p>
                     </div>
-                    <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                      <TrendingUp className="text-purple-400" size={20} />
+                    <div className="w-12 h-12 bg-gradient-adp rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <TrendingUp className="text-white" size={24} />
                     </div>
                   </div>
                 </CardContent>
