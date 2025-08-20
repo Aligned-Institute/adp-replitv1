@@ -116,10 +116,10 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-dark-card border-dark-border">
-                    <SelectItem value="medical" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🏥 Medical</SelectItem>
-                    <SelectItem value="legal" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">⚖️ Legal</SelectItem>
-                    <SelectItem value="technical" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">💻 Technical</SelectItem>
-                    <SelectItem value="financial" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">💰 Financial</SelectItem>
+                    <SelectItem value="medical" className="text-white hover:bg-adp-green hover:text-white focus:bg-adp-green focus:text-white">🏥 Medical</SelectItem>
+                    <SelectItem value="legal" className="text-white hover:bg-adp-green hover:text-white focus:bg-adp-green focus:text-white">⚖️ Legal</SelectItem>
+                    <SelectItem value="technical" className="text-white hover:bg-adp-green hover:text-white focus:bg-adp-green focus:text-white">💻 Technical</SelectItem>
+                    <SelectItem value="financial" className="text-white hover:bg-adp-green hover:text-white focus:bg-adp-green focus:text-white">💰 Financial</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -131,9 +131,9 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-dark-card border-dark-border">
-                    <SelectItem value="normal" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🟢 Normal</SelectItem>
-                    <SelectItem value="high" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🟡 High</SelectItem>
-                    <SelectItem value="urgent" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🔴 Urgent</SelectItem>
+                    <SelectItem value="normal" className="text-white hover:bg-adp-green hover:text-white focus:bg-adp-green focus:text-white">🟢 Normal</SelectItem>
+                    <SelectItem value="high" className="text-white hover:bg-adp-green hover:text-white focus:bg-adp-green focus:text-white">🟡 High</SelectItem>
+                    <SelectItem value="urgent" className="text-white hover:bg-adp-green hover:text-white focus:bg-adp-green focus:text-white">🔴 Urgent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
