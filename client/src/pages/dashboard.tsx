@@ -243,7 +243,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* ADP Message Formats and Query Results */}
+            {/* ADP Message Formats and Coordination Agent Logs */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {/* ADP Message Formats */}
               <MessageFormats 
@@ -251,15 +251,15 @@ export default function Dashboard() {
                 responses={queryResponses}
               />
 
-              {/* Query Results */}
-              <QueryResults 
-                responses={queryResponses}
-                routingResult={lastRoutingResult}
-              />
+              {/* Coordination Agent Logs */}
+              <CoordinationLogs logs={displayLogs} />
             </div>
 
-            {/* Coordination Agent Logs */}
-            <CoordinationLogs logs={displayLogs} />
+            {/* Query Results */}
+            <QueryResults 
+              responses={queryResponses}
+              routingResult={lastRoutingResult}
+            />
           </div>
         </div>
       </div>
