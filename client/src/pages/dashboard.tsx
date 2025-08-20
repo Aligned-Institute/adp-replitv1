@@ -170,7 +170,7 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-400 text-sm font-medium mb-1">Active Models</p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-2xl font-bold text-adp-green text-shadow-glow">
                         {displayStats?.activeNms || 0}<span className="text-gray-500">/{displayStats?.totalNms || 0}</span>
                       </p>
                       <p className="text-xs text-adp-blue mt-1">
@@ -189,7 +189,7 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-400 text-sm font-medium mb-1">Avg Response</p>
-                      <p className="text-2xl font-bold text-adp-amber text-shadow-glow">
+                      <p className="text-2xl font-bold text-adp-green text-shadow-glow">
                         {displayStats?.avgResponseTime || 0}<span className="text-sm">ms</span>
                       </p>
                       <p className="text-xs text-green-400 mt-1">
@@ -208,7 +208,7 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-gray-400 text-sm font-medium mb-1">Total Queries</p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-2xl font-bold text-adp-green text-shadow-glow">
                         {displayStats?.totalQueries || 0}
                       </p>
                       <p className="text-xs text-adp-blue mt-1">
