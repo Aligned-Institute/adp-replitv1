@@ -37,7 +37,7 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
         <div className="space-y-6">
           {/* Enhanced Master Controller */}
           <div className="text-center">
-            <div className={`inline-flex items-center justify-center w-32 h-16 bg-gradient-adp rounded-xl border shadow-lg transition-all duration-500 ${
+            <div className={`inline-flex items-center justify-center w-40 h-20 bg-gradient-adp rounded-xl border shadow-lg transition-all duration-500 ${
               isQueryActive ? 'border-adp-green blink-twice-master' : 'border-adp-blue'
             }`}>
               <div className="text-center">
