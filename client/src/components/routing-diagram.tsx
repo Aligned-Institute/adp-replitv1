@@ -38,7 +38,7 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
           {/* Enhanced Master Controller */}
           <div className="text-center">
             <div className={`inline-flex items-center justify-center w-32 h-16 bg-gradient-adp rounded-xl border shadow-lg transition-all duration-500 ${
-              isQueryActive ? 'border-adp-green animate-pulse' : 'border-adp-blue'
+              isQueryActive ? 'border-adp-green blink-twice-master' : 'border-adp-blue'
             }`}>
               <div className="text-center">
                 <div className={`text-sm font-bold transition-colors duration-500 ${
@@ -75,7 +75,7 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
             {/* Enhanced Primary NM */}
             <div className="space-y-2">
               <div className={`text-center text-sm font-semibold transition-colors duration-500 ${
-                isQueryActive ? 'text-adp-green' : 'text-gray-300'
+                isQueryActive ? 'text-adp-green blink-twice-primary' : 'text-gray-300'
               }`}>Primary Model</div>
               {primaryNM ? (
                 <div className="bg-gradient-success/20 border-2 border-adp-green rounded-xl p-4 text-center shadow-lg animate-scale-in">
@@ -89,7 +89,7 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
               ) : (
                 <div className={`rounded-xl p-4 text-center transition-all duration-500 ${
                   isQueryActive 
-                    ? 'bg-gradient-success/20 border-2 border-adp-green shadow-lg' 
+                    ? 'bg-gradient-success/20 border-2 border-adp-green shadow-lg blink-twice-primary' 
                     : 'bg-dark-surface border border-dark-border'
                 }`}>
                   <div className={`text-sm font-semibold transition-colors duration-500 ${
