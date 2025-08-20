@@ -41,12 +41,8 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
               isQueryActive ? 'border-adp-green blink-twice-master' : 'border-adp-blue'
             }`}>
               <div className="text-center">
-                <div className={`text-sm font-bold transition-colors duration-500 ${
-                  isQueryActive ? 'text-adp-green' : 'text-white'
-                }`}>Master</div>
-                <div className={`text-xs transition-colors duration-500 ${
-                  isQueryActive ? 'text-green-200' : 'text-blue-200'
-                }`}>Controller</div>
+                <div className="text-sm font-bold text-black">Master</div>
+                <div className="text-xs text-black">Controller</div>
               </div>
             </div>
           </div>
