@@ -116,10 +116,10 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-dark-card border-dark-border">
-                    <SelectItem value="medical" className="hover:bg-dark-card-hover">🏥 Medical</SelectItem>
-                    <SelectItem value="legal" className="hover:bg-dark-card-hover">⚖️ Legal</SelectItem>
-                    <SelectItem value="technical" className="hover:bg-dark-card-hover">💻 Technical</SelectItem>
-                    <SelectItem value="financial" className="hover:bg-dark-card-hover">💰 Financial</SelectItem>
+                    <SelectItem value="medical" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🏥 Medical</SelectItem>
+                    <SelectItem value="legal" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">⚖️ Legal</SelectItem>
+                    <SelectItem value="technical" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">💻 Technical</SelectItem>
+                    <SelectItem value="financial" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">💰 Financial</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -131,9 +131,9 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-dark-card border-dark-border">
-                    <SelectItem value="normal" className="hover:bg-dark-card-hover">🟢 Normal</SelectItem>
-                    <SelectItem value="high" className="hover:bg-dark-card-hover">🟡 High</SelectItem>
-                    <SelectItem value="urgent" className="hover:bg-dark-card-hover">🔴 Urgent</SelectItem>
+                    <SelectItem value="normal" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🟢 Normal</SelectItem>
+                    <SelectItem value="high" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🟡 High</SelectItem>
+                    <SelectItem value="urgent" className="hover:bg-white hover:text-black focus:bg-white focus:text-black">🔴 Urgent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
