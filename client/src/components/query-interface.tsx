@@ -173,21 +173,21 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
       </Card>
 
       {/* Preset Scenarios */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="bg-dark-card border-dark-border">
         <CardHeader>
-          <CardTitle className="text-sm font-semibold text-gray-300">Demo Scenarios</CardTitle>
+          <CardTitle className="text-sm font-semibold text-white">Demo Scenarios</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {scenarios?.map((scenario) => (
             <Button
               key={scenario.id}
               variant="ghost"
-              className="w-full text-left bg-gray-700 hover:bg-gray-600 p-3 h-auto justify-start"
+              className="w-full text-left bg-dark-surface hover:bg-adp-green hover:text-white border border-dark-border hover:border-adp-green p-3 h-auto justify-start transition-all duration-300"
               onClick={() => loadScenario(scenario)}
             >
               <div className="w-full">
                 <div className="font-medium text-white">{scenario.name}</div>
-                <div className="text-gray-400 text-xs">{scenario.description}</div>
+                <div className="text-gray-400 text-xs truncate">{scenario.description.replace(' with validation', '')}</div>
               </div>
             </Button>
           ))}
@@ -195,9 +195,9 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
       </Card>
 
       {/* Current Session */}
-      <Card className="bg-gray-800 border-gray-700">
+      <Card className="bg-dark-card border-dark-border">
         <CardHeader>
-          <CardTitle className="text-sm font-semibold text-gray-300">Session Info</CardTitle>
+          <CardTitle className="text-sm font-semibold text-white">Session Info</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex justify-between text-sm">
