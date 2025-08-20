@@ -239,18 +239,18 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Query Results and Message Formats */}
+            {/* ADP Message Formats and Query Results */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              {/* Query Results */}
-              <QueryResults 
-                responses={queryResponses}
-                routingResult={lastRoutingResult}
-              />
-
               {/* ADP Message Formats */}
               <MessageFormats 
                 routingResult={lastRoutingResult}
                 responses={queryResponses}
+              />
+
+              {/* Query Results */}
+              <QueryResults 
+                responses={queryResponses}
+                routingResult={lastRoutingResult}
               />
             </div>
 
