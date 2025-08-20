@@ -143,7 +143,7 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
                 <Textarea
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  className="w-full bg-dark-surface border-dark-border text-white h-32 resize-none hover:border-adp-blue focus:border-adp-blue transition-colors"
+                  className="w-full bg-white border-dark-border text-black h-32 resize-none hover:border-adp-blue focus:border-adp-blue transition-colors placeholder:text-gray-500"
                   placeholder="Enter your query here for AI model delegation..."
                 />
                 <div className="text-xs text-gray-400">
