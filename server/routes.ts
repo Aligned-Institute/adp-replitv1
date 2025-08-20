@@ -268,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: "Contract Review", 
         description: "Legal compliance assessment",
         domain: Domain.LEGAL,
-        priority: Priority.HIGH,
+        priority: Priority.NORMAL,
         query: "Review this employment contract for compliance with recent labor law changes and identify potential liability issues."
       },
       {
