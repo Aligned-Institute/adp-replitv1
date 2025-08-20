@@ -30,6 +30,7 @@ export default function Dashboard() {
   const [lastRoutingResult, setLastRoutingResult] = useState<RoutingResult | null>(null);
   const [systemStats, setSystemStats] = useState<SystemStats | null>(null);
   const [recentLogs, setRecentLogs] = useState<CoordinationLog[]>([]);
+  const [isProcessingQuery, setIsProcessingQuery] = useState<boolean>(false);
 
   // Fetch initial data
   const { data: stats, refetch: refetchStats } = useQuery<SystemStats>({
@@ -52,6 +53,7 @@ export default function Dashboard() {
           setQueryResponses(data.responses || []);
           setLastRoutingResult(data.routingResult);
           setCurrentSession(data.sessionId);
+          setIsProcessingQuery(false);
           refetchStats();
           refetchLogs();
           break;
@@ -86,6 +88,7 @@ export default function Dashboard() {
     setCurrentSession(sessionId);
     setQueryResponses([]);
     setLastRoutingResult(null);
+    setIsProcessingQuery(true);
   };
 
   return (
@@ -230,6 +233,7 @@ export default function Dashboard() {
                 <RoutingDiagram 
                   routingResult={lastRoutingResult}
                   narrowModels={narrowModels || []}
+                  isProcessingQuery={isProcessingQuery}
                 />
               </div>
 
