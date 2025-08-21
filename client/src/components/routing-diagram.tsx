@@ -68,11 +68,11 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
 
           {/* Narrow Models Grid */}
           <div className="grid grid-cols-3 gap-4">
-            {/* Enhanced Primary NM */}
+            {/* Enhanced Node Model 1 */}
             <div className="space-y-2">
               <div className={`text-center text-sm font-semibold transition-colors duration-500 ${
                 isQueryActive ? 'text-adp-green blink-twice-primary' : 'text-gray-300'
-              }`}>Primary Model</div>
+              }`}>Node Model 1</div>
               {primaryNM ? (
                 <div className="bg-gradient-success/20 border-2 border-adp-green rounded-xl p-4 text-center shadow-lg animate-scale-in">
                   <div className="text-sm font-bold text-adp-green">{primaryNM.id}</div>
@@ -100,23 +100,38 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
               )}
             </div>
 
-            {/* Validation NMs */}
+            {/* Node Models 2 and 3 */}
             {[0, 1].map((index) => {
               const validationNM = validationNMs[index];
+              const nodeModelNumber = index + 2;
               return (
                 <div key={index} className="space-y-2">
-                  <div className="text-center text-xs text-gray-400">Validation</div>
+                  <div className={`text-center text-sm font-semibold transition-colors duration-500 ${
+                    isQueryActive ? 'text-adp-green blink-twice-primary' : 'text-gray-300'
+                  }`}>Node Model {nodeModelNumber}</div>
                   {validationNM ? (
-                    <div className="bg-gray-600 border border-gray-500 rounded-lg p-3 text-center">
-                      <div className="text-sm font-semibold text-white">{validationNM.id}</div>
-                      <div className="text-xs text-gray-300">Weight: {validationNM.weight.toFixed(2)}</div>
-                      <div className="text-xs text-gray-300">Load: {validationNM.currentLoad}/{validationNM.maxConcurrent}</div>
-                      <div className="text-xs text-gray-300">Accuracy: {(validationNM.accuracyScore * 100).toFixed(0)}%</div>
+                    <div className="bg-gradient-success/20 border-2 border-adp-green rounded-xl p-4 text-center shadow-lg animate-scale-in">
+                      <div className="text-sm font-bold text-adp-green">{validationNM.id}</div>
+                      <div className="space-y-1 mt-2">
+                        <div className="text-xs text-gray-300">Weight: <span className="font-semibold">{validationNM.weight.toFixed(2)}</span></div>
+                        <div className="text-xs text-gray-300">Load: <span className="font-semibold">{validationNM.currentLoad}/{validationNM.maxConcurrent}</span></div>
+                        <div className="text-xs text-gray-300">Accuracy: <span className="font-semibold">{(validationNM.accuracyScore * 100).toFixed(0)}%</span></div>
+                      </div>
                     </div>
                   ) : (
-                    <div className="bg-gray-700 border border-gray-600 rounded-lg p-3 text-center">
-                      <div className="text-sm font-semibold text-gray-500">Not Selected</div>
-                      <div className="text-xs text-gray-600">--</div>
+                    <div className={`rounded-xl p-4 text-center transition-all duration-500 ${
+                      isQueryActive 
+                        ? 'bg-gradient-success/20 border-2 border-adp-green shadow-lg blink-twice-primary' 
+                        : 'bg-dark-surface border border-dark-border'
+                    }`}>
+                      <div className={`text-sm font-semibold transition-colors duration-500 ${
+                        isQueryActive ? 'text-adp-green' : 'text-gray-400'
+                      }`}>
+                        {isQueryActive ? 'Selected' : 'No Selection'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {isQueryActive ? 'Processing query...' : 'Awaiting delegation'}
+                      </div>
                     </div>
                   )}
                 </div>
