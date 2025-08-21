@@ -20,7 +20,7 @@ const generateUUID = () => {
 import type { SystemStats } from "@shared/schema";
 
 interface QueryInterfaceProps {
-  onQuerySubmitted: (sessionId: string) => void;
+  onQuerySubmitted: (sessionId: string, responses?: any[], routingResult?: any) => void;
   currentSession: string | null;
   sessionStats?: SystemStats | null;
 }
@@ -50,13 +50,15 @@ export function QueryInterface({ onQuerySubmitted, currentSession, sessionStats 
       return await response.json();
     },
     onSuccess: (data) => {
-      onQuerySubmitted(data.sessionId);
+      console.log("Query response received:", data);
+      onQuerySubmitted(data.sessionId, data.responses, data.routingResult);
       toast({
         title: "Query Processed",
-        description: "Your query has been delegated and processed successfully.",
+        description: `Query delegated to ${data.routingResult?.primary || 'narrow model'} successfully.`,
       });
     },
     onError: (error) => {
+      console.error("Query processing error:", error);
       toast({
         title: "Processing Failed",
         description: error.message,

@@ -48,8 +48,10 @@ export default function Dashboard() {
   // WebSocket connection
   const { isConnected, sendMessage } = useWebSocket({
     onMessage: (data) => {
+      console.log("WebSocket message received:", data);
       switch (data.type) {
         case "query_completed":
+          console.log("Query completed via WebSocket:", data);
           setQueryResponses(data.responses || []);
           setLastRoutingResult(data.routingResult);
           setCurrentSession(data.sessionId);
@@ -84,11 +86,53 @@ export default function Dashboard() {
     }
   }, [currentSession, sendMessage]);
 
-  const handleQuerySubmitted = (sessionId: string) => {
+  const handleQuerySubmitted = (sessionId: string, responses?: any[], routingResult?: any) => {
+    console.log("Query submitted with sessionId:", sessionId);
     setCurrentSession(sessionId);
-    setQueryResponses([]);
-    setLastRoutingResult(null);
-    setIsProcessingQuery(true);
+    
+    // If we have immediate data from the API response, use it
+    if (responses && responses.length > 0 && routingResult) {
+      console.log("Using immediate response data:", { responses, routingResult });
+      setQueryResponses(responses);
+      setLastRoutingResult(routingResult);
+      setIsProcessingQuery(false);
+    } else {
+      // Otherwise, wait for WebSocket or fallback
+      setQueryResponses([]);
+      setLastRoutingResult(null);
+      setIsProcessingQuery(true);
+    }
+    
+    // Also fetch the session data directly as fallback
+    setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/session/${sessionId}`);
+        if (response.ok) {
+          const sessionData = await response.json();
+          console.log("Fetched session data:", sessionData);
+          if (sessionData.responses && sessionData.responses.length > 0) {
+            setQueryResponses(sessionData.responses);
+            setIsProcessingQuery(false);
+            
+            // Also try to reconstruct routing result if available
+            const primaryResponse = sessionData.responses.find((r: any) => r.isPrimary);
+            if (primaryResponse && !lastRoutingResult) {
+              // Create a basic routing result from the response data
+              const reconstructedResult = {
+                primary: primaryResponse.nmId,
+                validation: sessionData.responses.filter((r: any) => !r.isPrimary).map((r: any) => r.nmId),
+                routingMethod: "query_response_reconstruction",
+                totalAvailable: 1,
+                targetNodeModel: 1 // Default, since we can't reconstruct this accurately
+              };
+              setLastRoutingResult(reconstructedResult);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching session data:", error);
+      }
+    }, 1000); // Give WebSocket a chance first
   };
 
   return (
