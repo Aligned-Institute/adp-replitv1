@@ -58,6 +58,7 @@ export const routingResultSchema = z.object({
   validation: z.array(z.string()),
   routingMethod: z.string(),
   totalAvailable: z.number().optional(),
+  targetNodeModel: z.number().optional(),
   error: z.string().optional()
 });
 

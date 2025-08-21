@@ -129,6 +129,55 @@ export class ADPRouter {
     return selectedNm;
   }
 
+  getNodeModelAssignment(domain: string, priority: string): number {
+    // Custom routing logic based on requirements:
+    // Medical & Financial: Normal -> Node 1, High -> Node 3, Urgent -> Node 2
+    // Legal & Technical: High -> Node 3, Urgent -> Node 1
+    // All other requests -> Node 2
+    
+    if (domain === Domain.MEDICAL || domain === Domain.FINANCIAL) {
+      if (priority === Priority.NORMAL) return 1;
+      if (priority === Priority.HIGH) return 3;
+      if (priority === Priority.URGENT) return 2;
+    }
+    
+    if (domain === Domain.LEGAL || domain === Domain.TECHNICAL) {
+      if (priority === Priority.HIGH) return 3;
+      if (priority === Priority.URGENT) return 1;
+    }
+    
+    // All other requests go to Node Model 2
+    return 2;
+  }
+
+  selectSpecificNodeModel(availableNMIds: string[], targetNodeModel: number): string | null {
+    // Map node model numbers to specific NM patterns
+    const nodeModelPatterns: { [key: number]: string[] } = {
+      1: ['med-cardio-01', 'fin-trading-01', 'legal-contracts-01', 'tech-ml-01'],
+      2: ['med-general-01', 'fin-advisory-01', 'legal-general-01', 'tech-security-01'],
+      3: ['fin-risk-01', 'legal-ip-01', 'tech-devops-01']
+    };
+    
+    const targetPatterns = nodeModelPatterns[targetNodeModel] || [];
+    
+    // First try to find exact match
+    for (const pattern of targetPatterns) {
+      if (availableNMIds.includes(pattern)) {
+        return pattern;
+      }
+    }
+    
+    // If no exact match, try to find any NM that could represent this node model
+    // For demo purposes, use the first available NM and map it conceptually
+    if (availableNMIds.length > 0) {
+      // Use modulo to consistently map to the same NM for the same node model
+      const index = (targetNodeModel - 1) % availableNMIds.length;
+      return availableNMIds[index];
+    }
+    
+    return null;
+  }
+
   async selectValidationNMs(request: RoutingRequest, exclude: string[], maxValidators: number = 2): Promise<string[]> {
     const availableNMs = await this.getHealthyNMsInDomain(request.domain);
     
@@ -194,31 +243,19 @@ export class ADPRouter {
       };
     }
     
-    // Select primary NM based on priority
+    // Select primary NM based on priority and domain (Custom Node Model Assignment)
     let primaryNm: string | null;
     let routingMethod: string;
     
-    if (request.priority === Priority.URGENT) {
-      // Use weighted selection for urgent requests (performance-focused)
+    // Custom routing logic based on priority and domain
+    const targetNodeModel = this.getNodeModelAssignment(request.domain, request.priority);
+    primaryNm = this.selectSpecificNodeModel(availableNMs, targetNodeModel);
+    routingMethod = `node_model_${targetNodeModel}_assignment`;
+    
+    // Fallback if specific node model not available
+    if (!primaryNm) {
       primaryNm = await this.calculateWeightedSelection(availableNMs);
-      routingMethod = "weighted_urgent";
-    } else if (request.priority === Priority.HIGH) {
-      // Hybrid approach - weighted selection from top round-robin candidates
-      const rrCandidate = this.roundRobinSelection(availableNMs, request.domain);
-      const topCandidates = rrCandidate ? [rrCandidate] : [];
-      
-      // Add a few more weighted candidates
-      const weightedCandidate = await this.calculateWeightedSelection(availableNMs);
-      if (weightedCandidate && weightedCandidate !== rrCandidate) {
-        topCandidates.push(weightedCandidate);
-      }
-      
-      primaryNm = await this.calculateWeightedSelection(topCandidates);
-      routingMethod = "hybrid_high";
-    } else {
-      // Normal priority - use round-robin for fair distribution
-      primaryNm = this.roundRobinSelection(availableNMs, request.domain);
-      routingMethod = "round_robin_normal";
+      routingMethod = "fallback_weighted";
     }
     
     // Select validation NMs if required
@@ -250,7 +287,8 @@ export class ADPRouter {
       primary: primaryNm,
       validation: validationNMs,
       routingMethod,
-      totalAvailable: availableNMs.length
+      totalAvailable: availableNMs.length,
+      targetNodeModel
     };
   }
 

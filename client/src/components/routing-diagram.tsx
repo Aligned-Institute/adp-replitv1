@@ -41,8 +41,8 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
               isQueryActive ? 'border-adp-green blink-twice-master' : 'border-adp-blue'
             }`}>
               <div className="text-center">
-                <div className="text-sm font-bold text-white">Master</div>
-                <div className="text-xs font-bold text-white">Controller</div>
+                <div className="text-xs font-bold text-white">MASTER CONTROLLER</div>
+                <div className="text-xs font-bold text-white">US01</div>
               </div>
             </div>
           </div>
@@ -71,9 +71,9 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
             {/* Enhanced Node Model 1 */}
             <div className="space-y-2">
               <div className={`text-center text-sm font-semibold transition-colors duration-500 ${
-                isQueryActive ? 'text-adp-green blink-twice-primary' : 'text-gray-300'
+                (isQueryActive && routingResult?.targetNodeModel === 1) ? 'text-adp-green blink-twice-primary' : 'text-gray-300'
               }`}>Node Model 1</div>
-              {primaryNM ? (
+              {primaryNM && routingResult?.targetNodeModel === 1 ? (
                 <div className="bg-gradient-success/20 border-2 border-adp-green rounded-xl p-4 text-center shadow-lg animate-scale-in">
                   <div className="text-sm font-bold text-adp-green">{primaryNM.id}</div>
                   <div className="space-y-1 mt-2">
@@ -84,17 +84,17 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
                 </div>
               ) : (
                 <div className={`rounded-xl p-4 text-center transition-all duration-500 ${
-                  isQueryActive 
+                  (isQueryActive && routingResult?.targetNodeModel === 1)
                     ? 'bg-gradient-success/20 border-2 border-adp-green shadow-lg blink-twice-primary' 
                     : 'bg-dark-surface border border-dark-border'
                 }`}>
                   <div className={`text-sm font-semibold transition-colors duration-500 ${
-                    isQueryActive ? 'text-adp-green' : 'text-gray-400'
+                    (isQueryActive && routingResult?.targetNodeModel === 1) ? 'text-adp-green' : 'text-gray-400'
                   }`}>
-                    {isQueryActive ? 'Selected' : 'No Selection'}
+                    {(isQueryActive && routingResult?.targetNodeModel === 1) ? 'Selected' : 'No Selection'}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {isQueryActive ? 'Processing query...' : 'Awaiting delegation'}
+                    {(isQueryActive && routingResult?.targetNodeModel === 1) ? 'Processing query...' : 'Awaiting delegation'}
                   </div>
                 </div>
               )}
@@ -104,33 +104,34 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
             {[0, 1].map((index) => {
               const validationNM = validationNMs[index];
               const nodeModelNumber = index + 2;
+              const isTargetNode = routingResult?.targetNodeModel === nodeModelNumber;
               return (
                 <div key={index} className="space-y-2">
                   <div className={`text-center text-sm font-semibold transition-colors duration-500 ${
-                    isQueryActive ? 'text-adp-green blink-twice-primary' : 'text-gray-300'
+                    (isQueryActive && isTargetNode) ? 'text-adp-green blink-twice-primary' : 'text-gray-300'
                   }`}>Node Model {nodeModelNumber}</div>
-                  {validationNM ? (
+                  {primaryNM && isTargetNode ? (
                     <div className="bg-gradient-success/20 border-2 border-adp-green rounded-xl p-4 text-center shadow-lg animate-scale-in">
-                      <div className="text-sm font-bold text-adp-green">{validationNM.id}</div>
+                      <div className="text-sm font-bold text-adp-green">{primaryNM.id}</div>
                       <div className="space-y-1 mt-2">
-                        <div className="text-xs text-gray-300">Weight: <span className="font-semibold">{validationNM.weight.toFixed(2)}</span></div>
-                        <div className="text-xs text-gray-300">Load: <span className="font-semibold">{validationNM.currentLoad}/{validationNM.maxConcurrent}</span></div>
-                        <div className="text-xs text-gray-300">Accuracy: <span className="font-semibold">{(validationNM.accuracyScore * 100).toFixed(0)}%</span></div>
+                        <div className="text-xs text-gray-300">Weight: <span className="font-semibold">{primaryNM.weight.toFixed(2)}</span></div>
+                        <div className="text-xs text-gray-300">Load: <span className="font-semibold">{primaryNM.currentLoad}/{primaryNM.maxConcurrent}</span></div>
+                        <div className="text-xs text-gray-300">Accuracy: <span className="font-semibold">{(primaryNM.accuracyScore * 100).toFixed(0)}%</span></div>
                       </div>
                     </div>
                   ) : (
                     <div className={`rounded-xl p-4 text-center transition-all duration-500 ${
-                      isQueryActive 
+                      (isQueryActive && isTargetNode)
                         ? 'bg-gradient-success/20 border-2 border-adp-green shadow-lg blink-twice-primary' 
                         : 'bg-dark-surface border border-dark-border'
                     }`}>
                       <div className={`text-sm font-semibold transition-colors duration-500 ${
-                        isQueryActive ? 'text-adp-green' : 'text-gray-400'
+                        (isQueryActive && isTargetNode) ? 'text-adp-green' : 'text-gray-400'
                       }`}>
-                        {isQueryActive ? 'Selected' : 'No Selection'}
+                        {(isQueryActive && isTargetNode) ? 'Selected' : 'No Selection'}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {isQueryActive ? 'Processing query...' : 'Awaiting delegation'}
+                        {(isQueryActive && isTargetNode) ? 'Processing query...' : 'Awaiting delegation'}
                       </div>
                     </div>
                   )}
@@ -152,8 +153,8 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
             <div className="mt-4 p-3 bg-gray-800 rounded-lg">
               <div className="grid grid-cols-2 gap-4 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Method:</span>
-                  <span className="text-white">{routingResult.routingMethod}</span>
+                  <span className="text-gray-400">Target Node:</span>
+                  <span className="text-adp-green font-semibold">Node Model {routingResult.targetNodeModel || 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400">Available:</span>
@@ -164,8 +165,8 @@ export function RoutingDiagram({ routingResult, narrowModels, isProcessingQuery 
                   <span className="text-white">{routingResult.primary || "None"}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Validators:</span>
-                  <span className="text-white">{routingResult.validation.length}</span>
+                  <span className="text-gray-400">Method:</span>
+                  <span className="text-white">{routingResult.routingMethod}</span>
                 </div>
               </div>
             </div>
