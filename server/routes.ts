@@ -153,7 +153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const response = await storage.createQueryResponse({
             sessionId: session.id,
             nmId: routingResult.primary,
-            content: `${institutionalResponse}: Based on my specialization in ${primaryNM.capabilities.join(', ')}, here is my analysis of your query: "${requestData.originalQuery}". This response demonstrates the capabilities of the ADP protocol in routing queries to specialized narrow models with institutional backing.`,
+            content: `${institutionalResponse} - Based on my specialization in ${primaryNM.capabilities.join(', ')}, here is my analysis of your query: "${requestData.originalQuery}". This response demonstrates the capabilities of the ADP protocol in routing queries to specialized narrow models with institutional backing.`,
             confidenceMetrics: {
               overallConfidence: primaryNM.accuracyScore,
               domainMatch: 0.95,
