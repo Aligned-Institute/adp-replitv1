@@ -12,6 +12,34 @@ import {
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
+// Custom institutional response mapping
+function getInstitutionalResponse(domain: string, priority: string, targetNodeModel: number): string {
+  const responses: Record<string, Record<string, string>> = {
+    [Domain.MEDICAL]: {
+      [Priority.NORMAL]: "Node Model Medical 01 Responded, UCLA Medical, Los Angeles, CA, USA",
+      [Priority.HIGH]: "Node Model Medical 02 Responded, University of Michigan, Ann Arbor, MI, USA", 
+      [Priority.URGENT]: "Node Model Medical 03 Responded, John's Hopkins, Baltimore, MD, USA"
+    },
+    [Domain.LEGAL]: {
+      [Priority.NORMAL]: "Node Model Legal 03 Responded, USC, Law School, CA, USA",
+      [Priority.HIGH]: "Node Model Legal 02 Responded, University of Chicago Law, Chicago, IL, USA",
+      [Priority.URGENT]: "Node Model Legal 01 Responded, Harvard Law School, Cambridge, MA, USA"
+    },
+    [Domain.TECHNICAL]: {
+      [Priority.NORMAL]: "Node Model Tech 01 Responded, USD, CS Dept, San Diego, CA, USA",
+      [Priority.HIGH]: "Node Model Tech 02 Responded, MIT, Cambridge, MA, USA",
+      [Priority.URGENT]: "Node Model Tech 03 Responded, Stanford University Stanford, CA, USA"
+    },
+    [Domain.FINANCIAL]: {
+      [Priority.NORMAL]: "Node Model Financial 03 Responded, Harvard School of Business, Boston, MA",
+      [Priority.HIGH]: "Node Model Financial 03 Responded, Harvard School of Business, Boston, MA",
+      [Priority.URGENT]: "Node Model Financial 03 Responded, Harvard School of Business, Boston, MA"
+    }
+  };
+  
+  return responses[domain]?.[priority] || `Node Model ${targetNodeModel} Responded, Default Institution, Location, USA`;
+}
+
 interface WSClient {
   ws: WebSocket;
   sessionId?: string;
@@ -114,10 +142,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const primaryNM = await storage.getNarrowModel(routingResult.primary);
         if (primaryNM) {
           const processingTime = primaryNM.responseTimeAvg + (Math.random() * 200 - 100); // ±100ms variance
+          const institutionalResponse = getInstitutionalResponse(requestData.domain, requestData.priority, routingResult.targetNodeModel || 1);
           const response = await storage.createQueryResponse({
             sessionId: session.id,
             nmId: routingResult.primary,
-            content: `Response from ${primaryNM.id}: Based on my specialization in ${primaryNM.capabilities.join(', ')}, here is my analysis of your query: "${requestData.originalQuery}". This response demonstrates the capabilities of the ADP protocol in routing queries to specialized narrow models.`,
+            content: `${institutionalResponse}: Based on my specialization in ${primaryNM.capabilities.join(', ')}, here is my analysis of your query: "${requestData.originalQuery}". This response demonstrates the capabilities of the ADP protocol in routing queries to specialized narrow models with institutional backing.`,
             confidenceMetrics: {
               overallConfidence: primaryNM.accuracyScore,
               domainMatch: 0.95,
