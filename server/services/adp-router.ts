@@ -130,13 +130,21 @@ export class ADPRouter {
   }
 
   getNodeModelAssignment(domain: string, priority: string): number {
-    // Custom routing logic based on requirements:
-    // Medical & Financial: Normal -> Node 1, High -> Node 3, Urgent -> Node 2
+    // Round Robin for all Normal priority requests across all domains
+    if (priority === Priority.NORMAL) {
+      // Use round robin counter for Normal priority
+      const currentIndex = this.roundRobinIndices.get('normal_priority') || 0;
+      const nodeModel = (currentIndex % 3) + 1; // Cycles between 1, 2, 3
+      this.roundRobinIndices.set('normal_priority', currentIndex + 1);
+      return nodeModel;
+    }
+    
+    // Custom routing logic for High and Urgent priorities:
+    // Medical & Financial: High -> Node 3, Urgent -> Node 2
     // Legal & Technical: High -> Node 3, Urgent -> Node 1
     // All other requests -> Node 2
     
     if (domain === Domain.MEDICAL || domain === Domain.FINANCIAL) {
-      if (priority === Priority.NORMAL) return 1;
       if (priority === Priority.HIGH) return 3;
       if (priority === Priority.URGENT) return 2;
     }

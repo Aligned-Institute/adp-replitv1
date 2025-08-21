@@ -14,24 +14,31 @@ import { randomUUID } from "crypto";
 
 // Custom institutional response mapping
 function getInstitutionalResponse(domain: string, priority: string, targetNodeModel: number): string {
+  // For Normal priority, use Round Robin responses based on target node model
+  if (priority === Priority.NORMAL) {
+    const roundRobinResponses: Record<number, string> = {
+      1: "Node Model 01 Responded, UCLA Medical, Los Angeles, CA, USA",
+      2: "Node Model 02 Responded, University of Michigan, Ann Arbor, MI, USA",
+      3: "Node Model 03 Responded, John's Hopkins, Baltimore, MD, USA"
+    };
+    return roundRobinResponses[targetNodeModel] || `Node Model ${targetNodeModel} Responded, Round Robin Institution, USA`;
+  }
+
+  // Specific responses for High and Urgent priorities by domain
   const responses: Record<string, Record<string, string>> = {
     [Domain.MEDICAL]: {
-      [Priority.NORMAL]: "Node Model Medical 01 Responded, UCLA Medical, Los Angeles, CA, USA",
       [Priority.HIGH]: "Node Model Medical 02 Responded, University of Michigan, Ann Arbor, MI, USA", 
       [Priority.URGENT]: "Node Model Medical 03 Responded, John's Hopkins, Baltimore, MD, USA"
     },
     [Domain.LEGAL]: {
-      [Priority.NORMAL]: "Node Model Legal 03 Responded, USC, Law School, CA, USA",
       [Priority.HIGH]: "Node Model Legal 02 Responded, University of Chicago Law, Chicago, IL, USA",
       [Priority.URGENT]: "Node Model Legal 01 Responded, Harvard Law School, Cambridge, MA, USA"
     },
     [Domain.TECHNICAL]: {
-      [Priority.NORMAL]: "Node Model Tech 01 Responded, USD, CS Dept, San Diego, CA, USA",
       [Priority.HIGH]: "Node Model Tech 02 Responded, MIT, Cambridge, MA, USA",
       [Priority.URGENT]: "Node Model Tech 03 Responded, Stanford University Stanford, CA, USA"
     },
     [Domain.FINANCIAL]: {
-      [Priority.NORMAL]: "Node Model Financial 03 Responded, Harvard School of Business, Boston, MA",
       [Priority.HIGH]: "Node Model Financial 03 Responded, Harvard School of Business, Boston, MA",
       [Priority.URGENT]: "Node Model Financial 03 Responded, Harvard School of Business, Boston, MA"
     }
